@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Student Marks Maintenance</title>
+</head>
+<body>
+ <h1>Student Marks Maintenance</h1>
+
+ <?php
+ 
+ $conn = mysqli_connect("localhost", "root", "", "students");
+
+ 
+ if (!$conn) {
+     die("Connection failed: " . mysqli_connect_error());
+ }
+
+ 
+ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  // Get the form data
+  $name = $_POST["name"];
+  $maths = $_POST["maths"];
+  $science = $_POST["science"];
+  $english = $_POST["english"];
+
+  
+  $total = $maths + $science + $english;
+  $percentage = ($total / 300) * 100;
+
+  
+  $sql = "INSERT INTO marks (name, maths, science, english, total, percentage) VALUES ('$name', $maths, $science, $english, $total, $percentage)";
+  if (mysqli_query($conn, $sql)) {
+      echo "New student added successfully";
+  } else {
+      echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+  }
+ }
+
+ 
+ $sql = "SELECT * FROM marks";
+ $result = mysqli_query($conn, $sql);
+
+ if (mysqli_num_rows($result) > 0) {
+     // Display the list of students
+     echo "<table>";
+     echo "<tr><th>Name</th><th>Maths</th><th>Science</th><th>English</th><th>Total</th><th>Percentage</th></tr>";
+     while($row = mysqli_fetch_assoc($result)) {
+         echo "<tr><td>" . $row["name"] . "</td><td>" . $row["maths"] . "</td><td>" . $row["science"] . "</td><td>" . $row["english"] . "</td><td>" . $row["total"] . "</td><td>" . $row["percentage"] . "%</td></tr>";
+     }
+     echo "</table>";
+ } else {
+     echo "0 results";
+ }
+
+ mysqli_close($conn);
+ ?>
+
+ <br>
+
+ <h2>Add New Student</h2>
+
+ <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+  <label for="name">Name:</label>
+  <input type="text" name="name" id="name" required><br><br>
+  <label for="maths">Maths:</label>
+  <input type="number" name="maths" id="maths" required><br><br>
+  <label for="science">Science:</label>
+  <input type="number" name="science" id="science" required><br><br>
+  <label for="english">English:</label>
+  <input type="number" name="english" id="english" required><br><br>
+  <input type="submit" value="Add Student">
+ </form>
+</body>
+</html>
+
